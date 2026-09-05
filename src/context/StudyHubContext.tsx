@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MODULES_DATA, ModuleData, SlideResource, TutorialResource, LabResource } from '@/data/modulesData';
 
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+
 interface ActiveModalState {
   type: 'slide' | 'lab' | 'tutorial';
   title: string;
@@ -51,7 +53,7 @@ export const StudyHubProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isAddModuleModalOpen, setIsAddModuleModalOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<ModuleData | null>(null);
 
-  // Load custom modules state from localStorage
+  // Universal cloud sync effect (Supabase + LocalStorage fallback)
   useEffect(() => {
     try {
       const savedModules = localStorage.getItem('csne_all_modules');
@@ -79,13 +81,76 @@ export const StudyHubProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch {
       setCompletedTutorials(initialMap);
     }
+
+    // Fetch universal cloud data from Supabase if configured
+    if (isSupabaseConfigured && supabase) {
+      const client = supabase;
+      const fetchUniversalData = async () => {
+        try {
+          const { data } = await client
+            .from('study_hub_data')
+            .select('modules, completed_tutorials')
+            .eq('id', 'global')
+            .single();
+
+          if (data && data.modules && Array.isArray(data.modules)) {
+            setModules(data.modules);
+            if (data.completed_tutorials) {
+              setCompletedTutorials(data.completed_tutorials);
+            }
+          }
+        } catch (err) {
+          console.warn('Supabase fetch error:', err);
+        }
+      };
+
+      fetchUniversalData();
+
+      // Subscribe to real-time changes across all connected devices & browsers
+      const channel = client
+        .channel('study-hub-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'study_hub_data', filter: 'id=eq.global' },
+          (payload: any) => {
+            if (payload.new && payload.new.modules) {
+              setModules(payload.new.modules);
+              if (payload.new.completed_tutorials) {
+                setCompletedTutorials(payload.new.completed_tutorials);
+              }
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        client.removeChannel(channel);
+      };
+    }
   }, []);
 
-  const saveModulesToStorage = (updatedModules: ModuleData[]) => {
+  const saveModulesToStorage = async (updatedModules: ModuleData[], updatedCompleted?: Record<string, boolean>) => {
     try {
       localStorage.setItem('csne_all_modules', JSON.stringify(updatedModules));
+      if (updatedCompleted) {
+        localStorage.setItem('csne_completed_tutorials', JSON.stringify(updatedCompleted));
+      }
     } catch {
       // Storage error handle
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      const client = supabase;
+      try {
+        await client.from('study_hub_data').upsert({
+          id: 'global',
+          modules: updatedModules,
+          completed_tutorials: updatedCompleted || completedTutorials,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn('Supabase universal update error:', err);
+      }
     }
   };
 
@@ -326,11 +391,7 @@ export const StudyHubProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const toggleTutorialCompletion = (tutorialId: string) => {
     setCompletedTutorials((prev) => {
       const updated = { ...prev, [tutorialId]: !prev[tutorialId] };
-      try {
-        localStorage.setItem('csne_completed_tutorials', JSON.stringify(updated));
-      } catch {
-        // LocalStorage fallback
-      }
+      saveModulesToStorage(modules, updated);
       return updated;
     });
   };
