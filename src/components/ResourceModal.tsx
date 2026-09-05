@@ -305,16 +305,16 @@ export const ResourceModal: React.FC = () => {
         className={`relative w-full bg-white dark:bg-slate-900 border border-emerald-100 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col transition-all duration-200 ${
           isFullscreen
             ? 'w-[98vw] h-[96vh] max-w-none rounded-2xl'
-            : 'w-[94vw] max-w-6xl h-[92vh] rounded-3xl'
+            : 'w-[98vw] sm:w-[94vw] max-w-6xl h-[95vh] sm:h-[92vh] rounded-2xl sm:rounded-3xl'
         }`}
       >
         {/* Header Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-slate-950/40 shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="px-2.5 py-1 text-xs font-bold uppercase rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-slate-950/40 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="px-2.5 py-1 text-[11px] sm:text-xs font-bold uppercase rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
               {format}
             </span>
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate pr-2">
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 truncate pr-1">
               {title}
             </h3>
           </div>
