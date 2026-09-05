@@ -233,9 +233,11 @@ export const StudyHubProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const resetToDefaultModules = () => {
-    setModules(MODULES_DATA);
+    setModules([]);
+    saveModulesToStorage([]);
     try {
       localStorage.removeItem('csne_all_modules');
+      localStorage.removeItem('csne_completed_tutorials');
     } catch {
       // Storage reset handle
     }

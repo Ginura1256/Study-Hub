@@ -182,11 +182,30 @@ export default function DashboardPage() {
         </div>
 
         {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredModules.map((mod) => (
-            <ModuleCard key={mod.id} module={mod} />
-          ))}
-        </div>
+        {filteredModules.length === 0 ? (
+          <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-emerald-100 dark:border-slate-800 shadow-xs flex flex-col items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 flex items-center justify-center mb-3">
+              <BookOpen className="w-7 h-7" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">No Academic Modules Found</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md">
+              Your study hub is currently empty. Click below to create your first academic module.
+            </p>
+            <button
+              onClick={() => setIsAddModuleModalOpen(true)}
+              className="mt-4 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/20 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Your First Module</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredModules.map((mod) => (
+              <ModuleCard key={mod.id} module={mod} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Bottom Section: Recent Slides & Pending Action Items */}
