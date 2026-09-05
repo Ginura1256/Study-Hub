@@ -28,7 +28,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 antialiased transition-colors">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <StudyHubProvider>
             <div className="flex min-h-screen">
               {/* Sidebar Component */}
