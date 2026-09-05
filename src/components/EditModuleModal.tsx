@@ -13,7 +13,7 @@ export const EditModuleModal: React.FC = () => {
   const [instructor, setInstructor] = useState('');
   const [credits, setCredits] = useState<number>(3);
   const [description, setDescription] = useState('');
-  const [color, setColor] = useState<'emerald' | 'cyan' | 'violet' | 'amber' | 'rose'>('emerald');
+  const [color, setColor] = useState<'emerald' | 'cyan' | 'teal' | 'amber' | 'rose'>('emerald');
   const [iconName, setIconName] = useState<'Network' | 'Server' | 'Code2' | 'Cloud' | 'Shield'>('Network');
 
   useEffect(() => {
